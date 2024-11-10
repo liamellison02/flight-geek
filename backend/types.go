@@ -9,7 +9,6 @@ import (
 type LoginResponse struct {
 	ID       int    `json:"id"`
 	Username string `json:"username"`
-	Number   int64  `json:"number"`
 	Token    string `json:"token"`
 }
 
@@ -77,7 +76,7 @@ func (a *User) ValidPassword(pw string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(a.EncryptedPassword), []byte(pw)) == nil
 }
 
-func NewUser(username, password string) (*User, error) {
+func NewUser(username string, password string) (*User, error) {
 	encpw, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
