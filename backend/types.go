@@ -17,6 +17,16 @@ type FlightResponse struct {
 	Flights []Flight `json:"flights"`
 }
 
+type CreateFlightRequest struct {
+	DepartureAirport string  `json:"departure_airport"`
+	ArrivalAirport   string  `json:"arrival_airport"`
+	DepartureDT      string  `json:"departure_date_time"`
+	ArrivalDT        string  `json:"arrival_date_time"`
+	Price            float64 `json:"price"`
+	AirlineID        int     `json:"airline_id"`
+	AirlineName      string  `json:"airline_name"`
+}
+
 type LoginResponse struct {
 	ID       int    `json:"id"`
 	Username string `json:"username"`
@@ -45,6 +55,8 @@ type User struct {
 
 type Flight struct {
 	FlightID         int       `json:"flight_id"`
+	AirlineID        int       `json:"airline_id"`
+	AirlineName      string    `json:"airline_name"`
 	DepartureDT      string    `json:"departure_date_time"`
 	ArrivalDT        string    `json:"arrival_date_time"`
 	DepartureAirport string    `json:"departure_airport"`
@@ -69,9 +81,9 @@ type Airport struct {
 }
 
 type Airline struct {
-	AirlineID      int    `json:"airline_id"`
-	Name           string `json:"name"`
-	CountyOfOrigin string `json:"country_of_origin"`
+	AirlineID       int    `json:"airline_id"`
+	AirlineNameName string `json:"airline_name"`
+	CountyOfOrigin  string `json:"country_of_origin"`
 }
 
 type Tracker struct {
@@ -97,5 +109,16 @@ func NewUser(username string, password string) (*User, error) {
 		Username:          username,
 		EncryptedPassword: string(encpw),
 		CreatedAt:         time.Now().UTC(),
+	}, nil
+}
+
+func NewFlight(departureDT string, arrivalDT string, departureAirport string, arrivalAirport string, price float64) (*Flight, error) {
+	return &Flight{
+		DepartureDT:      departureDT,
+		ArrivalDT:        arrivalDT,
+		DepartureAirport: departureAirport,
+		ArrivalAirport:   arrivalAirport,
+		Price:            price,
+		CreatedAt:        time.Now().UTC(),
 	}, nil
 }

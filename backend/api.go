@@ -98,13 +98,7 @@ func (s *APIServer) handleGetUser(w http.ResponseWriter) error {
 	return WriteJSON(w, http.StatusOK, Users)
 }
 
-func parseReqParams(r *http.Request, p *[]string) ([]string, error) {
-	for _, param := range *p {
-		if r.FormValue(param) == "" {
-			return 0, fmt.Errorf("missing required parameter %s", param)
-		}
-
-	}
+func parseID(r *http.Request) (int, error) {
 	idStr := mux.Vars(r)["id"]
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -112,6 +106,21 @@ func parseReqParams(r *http.Request, p *[]string) ([]string, error) {
 	}
 	return id, nil
 }
+
+// func parseReqParams(r *http.Request, p *[]string) ([]string, error) {
+// 	for _, param := range *p {
+// 		if r.FormValue(param) == "" {
+// 			return 0, fmt.Errorf("missing required parameter %s", param)
+// 		}
+
+// 	}
+// 	idStr := mux.Vars(r)["id"]
+// 	id, err := strconv.Atoi(idStr)
+// 	if err != nil {
+// 		return id, fmt.Errorf("invalid id given %s", idStr)
+// 	}
+// 	return id, nil
+// }
 
 func (s *APIServer) handleGetUserByID(w http.ResponseWriter, r *http.Request) error {
 	if r.Method == "GET" {
@@ -173,15 +182,68 @@ func (s *APIServer) handleFlight(w http.ResponseWriter) error {
 	return WriteJSON(w, http.StatusOK, Flights)
 }
 
+func (s *APIServer) handleCreateFlight(w http.ResponseWriter, r *http.Request) error {
+	req := new(CreateFlightRequest)
+	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+		return err
+	}
+
+	Flight := Flight{
+		DepartureDT:      req.DepartureDT,
+		ArrivalDT:        req.ArrivalDT,
+		DepartureAirport: req.DepartureAirport,
+		ArrivalAirport:   req.ArrivalAirport,
+		Price:            req.Price,
+		AirlineID:        req.AirlineID,
+		AirlineName:      req.AirlineName,
+	}
+	if err := s.db.CreateFlight(&Flight); err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, Flight)
+}
+
+func (s *APIServer) handleDeleteFlight(w http.ResponseWriter, r *http.Request) error {
+
+	id, err := parseID(r)
+
+	if err != nil {
+		return err
+	}
+
+	if err := s.db.DeleteFlight(id); err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, map[string]int{"deleted": id})
+}
+
 func (s *APIServer) handleGetFlight(w http.ResponseWriter, r *http.Request) error {
 	if r.Method == "GET" {
-		id, err := parseID(r)
-		if err != nil {
+		var req FlightRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			return err
 		}
 
-		Flight, err := s.db.GetFlight(id)
+		Flight, err := s.db.GetFlights()
 		if err != nil {
-			return
+			return err
 		}
+		return WriteJSON(w, http.StatusOK, Flight)
+	}
+
+	if r.Method == "DELETE" {
+		return s.handleDeleteFlight(w, r)
+	}
+
+	// if r.Method == "PUT" {
+	// 	return s.handleUpdateFlight(w, r)
+	// }
+
+	if r.Method == "POST" {
+		return s.handleCreateFlight(w, r)
+	}
+
+	return fmt.Errorf("method not allowed %s", r.Method)
 }

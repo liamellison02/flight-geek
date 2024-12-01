@@ -14,6 +14,9 @@ type DB interface {
 	GetUsers() ([]*User, error)
 	GetUserByID(int) (*User, error)
 	GetUserByUsername(string) (*User, error)
+	CreateFlight(*Flight) error
+	GetFlights() ([]*Flight, error)
+	DeleteFlight(int) error
 }
 
 type PostgresDB struct {
