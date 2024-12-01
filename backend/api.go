@@ -98,7 +98,13 @@ func (s *APIServer) handleGetUser(w http.ResponseWriter) error {
 	return WriteJSON(w, http.StatusOK, Users)
 }
 
-func parseID(r *http.Request) (int, error) {
+func parseReqParams(r *http.Request, p *[]string) ([]string, error) {
+	for _, param := range *p {
+		if r.FormValue(param) == "" {
+			return 0, fmt.Errorf("missing required parameter %s", param)
+		}
+
+	}
 	idStr := mux.Vars(r)["id"]
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -157,4 +163,25 @@ func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) err
 	}
 
 	return WriteJSON(w, http.StatusOK, map[string]int{"deleted": id})
+}
+
+func (s *APIServer) handleFlight(w http.ResponseWriter) error {
+	Flights, err := s.db.GetFlights()
+	if err != nil {
+		return err
+	}
+	return WriteJSON(w, http.StatusOK, Flights)
+}
+
+func (s *APIServer) handleGetFlight(w http.ResponseWriter, r *http.Request) error {
+	if r.Method == "GET" {
+		id, err := parseID(r)
+		if err != nil {
+			return err
+		}
+
+		Flight, err := s.db.GetFlight(id)
+		if err != nil {
+			return
+		}
 }

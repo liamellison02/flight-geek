@@ -37,8 +37,12 @@ func NewPostgresDB() (*PostgresDB, error) {
 	}, nil
 }
 
-func (s *PostgresDB) Init() error {
-	return s.createUserTable()
+func (s *PostgresDB) Init() (error, error) {
+	return s.createUserTable(), s.createFlightTable()
+}
+
+func (s *PostgresDB) Close() {
+	s.db.Close()
 }
 
 func (s *PostgresDB) createUserTable() error {
@@ -47,6 +51,22 @@ func (s *PostgresDB) createUserTable() error {
 		username varchar(100),
 		encrypted_password varchar(100),
 		created_at timestamp
+	)`
+
+	_, err := s.db.Exec(query)
+	return err
+}
+
+func (s *PostgresDB) createFlightTable() error {
+	query := `create table if not exists Flight (
+		flight_id serial primary key,
+		departure_date_time timestamp,
+		arrival_date_time timestamp,
+		departure_airport varchar(100),
+		arrival_airport varchar(100),
+		price float,
+		created_at timestamp,
+		updated_at timestamp
 	)`
 
 	_, err := s.db.Exec(query)
@@ -133,4 +153,88 @@ func scanIntoUser(rows *sql.Rows) (*User, error) {
 		&User.CreatedAt)
 
 	return User, err
+}
+
+func (s *PostgresDB) CreateFlight(flight *Flight) error {
+	query := `insert into Flight (flight_id, departure_date_time, 
+		arrival_date_time, departure_airport, arrival_airport, price, 
+		created_at, updated_at) values ($1, $2, $3, $4, $5, $6, $7, $8)`
+
+	_, err := s.db.Query(
+		query,
+		flight.FlightID,
+		flight.DepartureDT,
+		flight.ArrivalDT,
+		flight.DepartureAirport,
+		flight.ArrivalAirport,
+		flight.Price,
+		flight.CreatedAt,
+		flight.UpdatedAt)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *PostgresDB) GetFlights() ([]*Flight, error) {
+	rows, err := s.db.Query("select * from Flight")
+	if err != nil {
+		return nil, err
+	}
+
+	Flights := []*Flight{}
+	for rows.Next() {
+		Flight, err := scanIntoFlight(rows)
+		if err != nil {
+			return nil, err
+		}
+		Flights = append(Flights, Flight)
+	}
+
+	return Flights, nil
+}
+
+func (s *PostgresDB) GetFlightByID(id int) (*Flight, error) {
+	rows, err := s.db.Query("select * from Flight where flight_id = $1", id)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		return scanIntoFlight(rows)
+	}
+
+	return nil, fmt.Errorf("Flight %d not found", id)
+}
+
+func (s *PostgresDB) UpdateFlight(*Flight) error {
+	// TODO: Implement
+	return nil
+}
+
+func (s *PostgresDB) DeleteFlight(id int) error {
+	_, err := s.db.Query("delete from Flight where flight_id = $1", id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func scanIntoFlight(rows *sql.Rows) (*Flight, error) {
+	Flight := new(Flight)
+	err := rows.Scan(
+		&Flight.FlightID,
+		&Flight.DepartureDT,
+		&Flight.ArrivalDT,
+		&Flight.DepartureAirport,
+		&Flight.ArrivalAirport,
+		&Flight.Price,
+		&Flight.CreatedAt,
+		&Flight.UpdatedAt)
+
+	return Flight, err
 }

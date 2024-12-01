@@ -6,6 +6,17 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type FlightRequest struct {
+	DepartureAirport string `json:"departure_airport"`
+	ArrivalAirport   string `json:"arrival_airport"`
+	DepartureDT      string `json:"departure_date_time"`
+	ArrivalDT        string `json:"arrival_date_time"`
+}
+
+type FlightResponse struct {
+	Flights []Flight `json:"flights"`
+}
+
 type LoginResponse struct {
 	ID       int    `json:"id"`
 	Username string `json:"username"`
