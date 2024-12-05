@@ -3,9 +3,14 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"reflect"
 
 	_ "github.com/lib/pq"
 )
+
+type PostgresDB struct {
+	db *sql.DB
+}
 
 type DB interface {
 	CreateUser(*User) error
@@ -19,13 +24,15 @@ type DB interface {
 	DeleteFlight(int) error
 }
 
-type PostgresDB struct {
-	db *sql.DB
+type initDB interface {
+	createUserTable() error
+	createFlightTable() error
+	createTrackerTable() error
 }
 
 func NewPostgresDB() (*PostgresDB, error) {
 	// connStr will need to be replaced
-	connStr := "user=postgres dbname=postgres password=password sslmode=disable"
+	connStr := "user=lellison dbname=flight_geek_db password= sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, err
@@ -40,13 +47,37 @@ func NewPostgresDB() (*PostgresDB, error) {
 	}, nil
 }
 
-func (s *PostgresDB) Init() (error, error) {
-	return s.createUserTable(), s.createFlightTable()
+func Init(s *initDB) error {
+	// Go allows dynamic dispatch of methods on interfaces, so we can call the
+	// createUserTable and createFlightTable methods on the PostgresDB struct
+	// without knowing the concrete type of the struct at compile time. In a
+	// language like Java, you type your params in your function signature
+	// which are then set at compile time, and so any args passed into that
+	// function must match the same types you defined in your function
+	// signature at compile time. Go doesn't have generics and so you can type
+	// a param as an interface, and pass a struct in for that arg so long as it
+	// implements all the interface's methods (i.e. it implements the interface).
+	// Pretty dope for a statically typed language...
+
+	rtVal := reflect.ValueOf(s)
+	rtType := reflect.TypeOf(s)
+	for i := 0; i < rtType.NumMethod(); i++ {
+		method := rtVal.Method(i)
+		if method.Type().NumIn() == 1 {
+			if err := method.Call([]reflect.Value{})[0].Interface(); err != nil {
+				return err.(error)
+			}
+		}
+	}
+
+	return nil
 }
 
 func (s *PostgresDB) Close() {
 	s.db.Close()
 }
+
+// Schema Initialization:
 
 func (s *PostgresDB) createUserTable() error {
 	query := `create table if not exists User (
@@ -75,6 +106,47 @@ func (s *PostgresDB) createFlightTable() error {
 	_, err := s.db.Exec(query)
 	return err
 }
+
+func (s *PostgresDB) createTrackerTable() error {
+	query := `create table if not exists Tracker (
+		id serial primary key,
+		user_id int,
+		flight_id int,
+		created_at timestamp
+	)`
+	_, err := s.db.Exec(query)
+	return err
+}
+
+// Helper functions to scan rows and populate/return data as structs:
+
+func scanIntoUser(rows *sql.Rows) (*User, error) {
+	User := new(User)
+	err := rows.Scan(
+		&User.ID,
+		&User.Username,
+		&User.EncryptedPassword,
+		&User.CreatedAt)
+
+	return User, err
+}
+
+func scanIntoFlight(rows *sql.Rows) (*Flight, error) {
+	Flight := new(Flight)
+	err := rows.Scan(
+		&Flight.FlightID,
+		&Flight.DepartureDT,
+		&Flight.ArrivalDT,
+		&Flight.DepartureAirport,
+		&Flight.ArrivalAirport,
+		&Flight.Price,
+		&Flight.CreatedAt,
+		&Flight.UpdatedAt)
+
+	return Flight, err
+}
+
+// Wrapper functions for CRUD operations:
 
 func (s *PostgresDB) CreateUser(user *User) error {
 	query := `insert into User (username, encrypted_password, created_at) values ($1, $2, $3)`
@@ -147,17 +219,6 @@ func (s *PostgresDB) GetUsers() ([]*User, error) {
 	return Users, nil
 }
 
-func scanIntoUser(rows *sql.Rows) (*User, error) {
-	User := new(User)
-	err := rows.Scan(
-		&User.ID,
-		&User.Username,
-		&User.EncryptedPassword,
-		&User.CreatedAt)
-
-	return User, err
-}
-
 func (s *PostgresDB) CreateFlight(flight *Flight) error {
 	query := `insert into Flight (flight_id, departure_date_time, 
 		arrival_date_time, departure_airport, arrival_airport, price, 
@@ -173,6 +234,21 @@ func (s *PostgresDB) CreateFlight(flight *Flight) error {
 		flight.Price,
 		flight.CreatedAt,
 		flight.UpdatedAt)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *PostgresDB) UpdateFlight(*Flight) error {
+	// TODO: Implement
+	return nil
+}
+
+func (s *PostgresDB) DeleteFlight(id int) error {
+	_, err := s.db.Query("delete from Flight where flight_id = $1", id)
 
 	if err != nil {
 		return err
@@ -210,34 +286,4 @@ func (s *PostgresDB) GetFlightByID(id int) (*Flight, error) {
 	}
 
 	return nil, fmt.Errorf("Flight %d not found", id)
-}
-
-func (s *PostgresDB) UpdateFlight(*Flight) error {
-	// TODO: Implement
-	return nil
-}
-
-func (s *PostgresDB) DeleteFlight(id int) error {
-	_, err := s.db.Query("delete from Flight where flight_id = $1", id)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func scanIntoFlight(rows *sql.Rows) (*Flight, error) {
-	Flight := new(Flight)
-	err := rows.Scan(
-		&Flight.FlightID,
-		&Flight.DepartureDT,
-		&Flight.ArrivalDT,
-		&Flight.DepartureAirport,
-		&Flight.ArrivalAirport,
-		&Flight.Price,
-		&Flight.CreatedAt,
-		&Flight.UpdatedAt)
-
-	return Flight, err
 }
