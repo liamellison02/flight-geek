@@ -6,3 +6,7 @@ frontend/build
 # Go
 backend/bin
 backend/pkg
+
+*.git
+*.idea
+*.env
