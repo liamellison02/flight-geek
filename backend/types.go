@@ -6,7 +6,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type FlightRequest struct {
+type FlightSearchRequest struct {
 	DepartureAirport string `json:"departure_airport"`
 	ArrivalAirport   string `json:"arrival_airport"`
 	DepartureDT      string `json:"departure_date_time"`
