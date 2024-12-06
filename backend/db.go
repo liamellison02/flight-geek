@@ -94,6 +94,8 @@ func (s *PostgresDB) createUserTable() error {
 func (s *PostgresDB) createFlightTable() error {
 	query := `create table if not exists Flight (
 		flight_id serial primary key,
+		airline_id int,
+		airline_name varchar(100),
 		departure_date_time timestamp,
 		arrival_date_time timestamp,
 		departure_airport varchar(100),
@@ -135,6 +137,8 @@ func scanIntoFlight(rows *sql.Rows) (*Flight, error) {
 	Flight := new(Flight)
 	err := rows.Scan(
 		&Flight.FlightID,
+		&Flight.AirlineID,
+		&Flight.AirlineName,
 		&Flight.DepartureDT,
 		&Flight.ArrivalDT,
 		&Flight.DepartureAirport,
