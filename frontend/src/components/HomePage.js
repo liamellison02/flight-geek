@@ -7,6 +7,8 @@ const HomePage = () => {
     const [signupEmail, setSignupEmail] = useState('');
     const [signupPassword, setSignupPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [hoverLogin, setHoverLogin] = useState(false);
+    const [hoverSignup, setHoverSignup] = useState(false);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -59,7 +61,7 @@ const HomePage = () => {
                 {/* Login Form */}
                 <div style={{
                     width: '45%',
-                    backgroundColor: '#fff',
+                    backgroundColor: '#6996F0',
                     padding: '20px',
                     borderRadius: '8px',
                     boxShadow: '0 4px 8px rgba(10, 10, 10, 10)',
@@ -89,11 +91,13 @@ const HomePage = () => {
                                 padding: '10px 20px',
                                 marginTop: '10px',
                                 cursor: 'pointer',
-                                backgroundColor: '#007BFF',
+                                backgroundColor: hoverLogin ? '#0056b3' : '#007BFF',
                                 color: '#fff',
                                 border: 'none',
                                 borderRadius: '4px'
                             }}
+                            onMouseEnter={() => setHoverLogin(true)}
+                            onMouseLeave={() => setHoverLogin(false)}
                         >
                             Login
                         </button>
@@ -103,7 +107,7 @@ const HomePage = () => {
                 {/* Signup Form */}
                 <div style={{
                     width: '45%',
-                    backgroundColor: '#fff',
+                    backgroundColor: '#6996F0',
                     padding: '20px',
                     borderRadius: '8px',
                     boxShadow: '0 4px 8px rgba(10, 10, 10, 10)',
@@ -133,11 +137,13 @@ const HomePage = () => {
                                 padding: '10px 20px',
                                 marginTop: '10px',
                                 cursor: 'pointer',
-                                backgroundColor: '#007BFF',
+                                backgroundColor: hoverSignup ? '#0056b3' : '#007BFF',
                                 color: '#fff',
                                 border: 'none',
                                 borderRadius: '4px'
                             }}
+                            onMouseEnter={() => setHoverSignup(true)}
+                            onMouseLeave={() => setHoverSignup(false)}
                         >
                             Sign Up
                         </button>
