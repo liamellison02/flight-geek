@@ -6,6 +6,10 @@ frontend/build
 # Go
 backend/bin
 backend/pkg
+backend/__pycache__
+backend/.env
+backend/venv
+
 
 *.git
 *.idea
