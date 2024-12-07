@@ -35,12 +35,33 @@ const HomePage = () => {
     };
 
     return (
-        <div style={{ textAlign: 'center', padding: '20px' }}>
-            <h1>Welcome to the Flight Tracker App</h1>
+            <div style={{
+                        textAlign: 'center',
+                        padding: '20px',
+                        fontFamily: 'Arial, sans-serif',
+                        backgroundColor: '#4465a6',
+                        minHeight: '96vh',
+                        overflow: 'hidden'
+                    }}>            
+            
+            <h1 style={{ color: '#000', marginBottom: '20px' }}>Welcome to the Flight Tracker App</h1>
+            <br></br>
 
-            <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '20px' }}>
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-around',
+                marginTop: '20px',
+                flexWrap: 'wrap'
+            }}>               
                 {/* Login Form */}
-                <div style={{ width: '45%' }}>
+                <div style={{
+                    width: '45%',
+                    backgroundColor: '#fff',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 8px rgba(10, 10, 10, 10)',
+                    marginBottom: '20px'
+                }}>
                     <h2>Login</h2>
                     <form onSubmit={handleLogin}>
                         <input
@@ -61,7 +82,15 @@ const HomePage = () => {
                         />
                         <button
                             type="submit"
-                            style={{ padding: '10px 20px', marginTop: '10px', cursor: 'pointer' }}
+                            style={{
+                                padding: '10px 20px',
+                                marginTop: '10px',
+                                cursor: 'pointer',
+                                backgroundColor: '#007BFF',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '4px'
+                            }}
                         >
                             Login
                         </button>
@@ -69,7 +98,14 @@ const HomePage = () => {
                 </div>
 
                 {/* Signup Form */}
-                <div style={{ width: '45%' }}>
+                <div style={{
+                    width: '45%',
+                    backgroundColor: '#fff',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 8px rgba(10, 10, 10, 10)',
+                    marginBottom: '20px'
+                }}>
                     <h2>Sign Up</h2>
                     <form onSubmit={handleSignup}>
                         <input
@@ -90,7 +126,15 @@ const HomePage = () => {
                         />
                         <button
                             type="submit"
-                            style={{ padding: '10px 20px', marginTop: '10px', cursor: 'pointer' }}
+                            style={{
+                                padding: '10px 20px',
+                                marginTop: '10px',
+                                cursor: 'pointer',
+                                backgroundColor: '#007BFF',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '4px'
+                            }}
                         >
                             Sign Up
                         </button>
