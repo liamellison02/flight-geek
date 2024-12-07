@@ -44,8 +44,11 @@ const HomePage = () => {
                         overflow: 'hidden'
                     }}>            
             
-            <h1 style={{ color: '#000', marginBottom: '20px' }}>Welcome to the Flight Tracker App</h1>
-            <br></br>
+            <div style={{ marginTop: '180px' }}></div>
+            <h1 style={{ color: '#000', marginBottom: '20px' }}>Welcome to Flight Geek</h1><br></br>
+            <h2 style={{ color: '#000', marginBottom: '20px' }}>Find and Compare Flight Prices Today!</h2>
+            <div style={{ marginTop: '100px' }}></div>
+
 
             <div style={{
                 display: 'flex',
