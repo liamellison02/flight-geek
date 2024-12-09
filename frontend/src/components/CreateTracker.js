@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { History, AlertTriangle, Trash2 } from 'lucide-react';
-import { Alert, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertTitle } from './ui/Alert';
 
 const CreateTracker = () => {
     const [trackedFlights, setTrackedFlights] = useState([

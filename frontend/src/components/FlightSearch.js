@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Search, Plane, Loader2 } from 'lucide-react';
-import { Alert, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertTitle } from './ui/Alert';
 
 const FlightSearch = () => {
     const [flightNumber, setFlightNumber] = useState('');
