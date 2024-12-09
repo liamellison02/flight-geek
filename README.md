@@ -1,32 +1,19 @@
 # Flight Price Tracker
 
-Flight Price Tracker is a web application that allows users to monitor and track flight prices over time. It offers a user-friendly interface, displays historical price data, current prices, predicts future prices, and provides a 'deal rating' system based on historical trends and other factors.
+Flight Geek is a web application designed to help users track flight prices over time, offering insights into price trends and alerts for potential deals. By integrating external APIs, the system provides real-time and historical flight price data to empower users with informed decision-making.
+
 
 ## Features
 - **Flight Price Monitoring:** Track prices for specific flights over time.
 - **Historical Data Visualization:** View historical price trends with charts and graphs.
-- **Price Prediction:** Get future price predictions using historical trends and models.
-- **Deal Rating System:** Evaluate whether current prices are good deals based on past trends.
+- **User Authentication: Secure login and registration for personalized experiences.
+- **Data Insights: Aggregate and analyze flight price data for better decisions.
+- **Real-Time Updates: API-driven hourly price updates for tracked flights.
 - **User-Friendly Interface:** Simplified and intuitive design.
 
+
 ## Tech Stack
-- **Frontend:** React.js
-- **Backend:** Golang (JSON API)
+- **Frontend:** React.js, HTML, CSS
+- **Backend:** Python (Flask)
 - **Database:** PostgreSQL
-- **Other Tools:** Celery for scheduled jobs (potential integration), AWS S3 & Amplify for hosting and storage.
-
-## Setup Instructions
-
-### Prerequisites
-- Node.js and npm
-- Golang
-- PostgreSQL
-- AWS CLI (optional, for S3 integration)
-
-### Frontend
-
-Clone the repository and navigate to the frontend directory:
-
-```bash
-git clone https://github.com/your-repo/flight-price-tracker.git
-cd flight-price-tracker/frontend
+- **Other Tools:** Flight Labs API for flight and pricing data, AWS S3 & Amplify for hosting and storage.
