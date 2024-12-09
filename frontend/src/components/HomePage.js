@@ -96,7 +96,7 @@ const HomePage = () => {
                         Welcome to Flight Geek
                     </h1>
                     <p className="text-[#40E0FF] text-lg">
-                        Find and Compare Flight Prices Today!
+                        Find and Track Flight Prices Today!
                     </p>
                 </div>
 
