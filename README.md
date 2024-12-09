@@ -6,9 +6,9 @@ Flight Geek is a web application designed to help users track flight prices over
 ## Features
 - **Flight Price Monitoring:** Track prices for specific flights over time.
 - **Historical Data Visualization:** View historical price trends with charts and graphs.
-- **User Authentication: Secure login and registration for personalized experiences.
-- **Data Insights: Aggregate and analyze flight price data for better decisions.
-- **Real-Time Updates: API-driven hourly price updates for tracked flights.
+- **User Authentication:** Secure login and registration for personalized experiences.
+- **Data Insights**: Aggregate and analyze flight price data for better decisions.
+- **Real-Time Updates**: API-driven hourly price updates for tracked flights.
 - **User-Friendly Interface:** Simplified and intuitive design.
 
 
