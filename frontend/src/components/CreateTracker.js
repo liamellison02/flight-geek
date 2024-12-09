@@ -147,9 +147,9 @@ const CreateTracker = () => {
                                 Quick Tips
                             </h3>
                             <ul className="text-gray-300 text-sm space-y-1">
-                                <li>• User ID can be found in your profile settings</li>
+                                <li>• User ID is the same as your login email</li>
                                 <li>• Flight ID is shown in flight search results</li>
-                                <li>• You'll receive notifications when prices change</li>
+                                <li>• Prices will be tracked every hour, you will see updates on this screen</li>
                             </ul>
                         </div>
                     </div>
