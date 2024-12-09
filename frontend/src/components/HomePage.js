@@ -15,12 +15,15 @@ const HomePage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:5000/login', {
-                email: loginEmail,
-                password: loginPassword,
-            });
-            setMessage(response.data.message || 'Login successful');
-            setMessageType('success');
+            const response = await axios.post('http://localhost:5000/login', { email: loginEmail, password: loginPassword });
+            
+            if (response.status === 200 || response.data.message === 'Login successful') {
+                setMessage('Login successful');
+                setMessageType('success');
+                setTimeout(() => {
+                    navigate('/search-flights');
+                }, 500);
+            }
         } catch (error) {
             setMessage(error.response?.data?.error || 'Login failed');
             setMessageType('error');
@@ -36,6 +39,9 @@ const HomePage = () => {
             });
             setMessage(response.data.message || 'Signup successful');
             setMessageType('success');
+            setTimeout(() => {
+                navigate('/search-flights');
+            }, 500);
         } catch (error) {
             setMessage(error.response?.data?.error || 'Signup failed');
             setMessageType('error');

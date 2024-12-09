@@ -95,20 +95,23 @@ def search_flights():
     filters = ['flight_number', 'airline_id', 'origin', 'destination', 'departure_time']
     query = Flight.query
 
-    for filter in filters:
-        if filter in request.args:
-            query = query.filter_by(filter=request.args.get(filter))
+    for filter_name in filters:
+        if filter_name in request.args:
+            query = query.filter(getattr(Flight, filter_name) == request.args.get(filter_name))
 
     flights = query.all()
 
-    result = [{
-        "id": flight.id,
-        "flight_number": flight.flight_number,
-        "origin": flight.origin,
-        "destination": flight.destination,
-        "departure_time": flight.departure_time
-    } for flight in flights]
-
+    result = [
+        {
+            "id": flight.id,
+            "flight_number": flight.flight_number,
+            "origin": flight.origin,
+            "destination": flight.destination,
+            "departure_time": flight.departure_time
+        }
+        for flight in flights
+    ]
+    
     return jsonify(result), 200
 
 
