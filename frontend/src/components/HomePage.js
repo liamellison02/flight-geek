@@ -7,6 +7,7 @@ const HomePage = () => {
     const [signupEmail, setSignupEmail] = useState('');
     const [signupPassword, setSignupPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [messageType, setMessageType] = useState(''); // New state for message type
     const [hoverLogin, setHoverLogin] = useState(false);
     const [hoverSignup, setHoverSignup] = useState(false);
 
@@ -18,8 +19,10 @@ const HomePage = () => {
                 password: loginPassword,
             });
             setMessage(response.data.message || 'Login successful');
+            setMessageType('success');
         } catch (error) {
             setMessage(error.response?.data?.error || 'Login failed');
+            setMessageType('error');
         }
     };
 
@@ -31,42 +34,49 @@ const HomePage = () => {
                 password: signupPassword,
             });
             setMessage(response.data.message || 'Signup successful');
+            setMessageType('success');
         } catch (error) {
             setMessage(error.response?.data?.error || 'Signup failed');
+            setMessageType('error');
         }
     };
 
     return (
-            <div style={{
-                        textAlign: 'center',
-                        padding: '20px',
-                        fontFamily: 'Arial, sans-serif',
-                        backgroundColor: '#4465a6',
-                        minHeight: '96vh',
-                        overflow: 'hidden'
-                    }}>            
-            
+        <div
+            style={{
+                textAlign: 'center',
+                padding: '20px',
+                fontFamily: 'Arial, sans-serif',
+                backgroundColor: '#4465a6',
+                minHeight: '96vh',
+                overflow: 'hidden',
+            }}
+        >
             <div style={{ marginTop: '180px' }}></div>
-            <h1 style={{ color: '#000', marginBottom: '20px' }}>Welcome to Flight Geek</h1><br></br>
+            <h1 style={{ color: '#000', marginBottom: '20px' }}>Welcome to Flight Geek</h1>
+            <br />
             <h2 style={{ color: '#000', marginBottom: '20px' }}>Find and Compare Flight Prices Today!</h2>
             <div style={{ marginTop: '100px' }}></div>
 
-
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-around',
-                marginTop: '20px',
-                flexWrap: 'wrap'
-            }}>               
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'space-around',
+                    marginTop: '20px',
+                    flexWrap: 'wrap',
+                }}
+            >
                 {/* Login Form */}
-                <div style={{
-                    width: '45%',
-                    backgroundColor: '#6996F0',
-                    padding: '20px',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 8px rgba(10, 10, 10, 10)',
-                    marginBottom: '20px'
-                }}>
+                <div
+                    style={{
+                        width: '45%',
+                        backgroundColor: '#6996F0',
+                        padding: '20px',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 8px rgba(10, 10, 10, 10)',
+                        marginBottom: '20px',
+                    }}
+                >
                     <h2>Login</h2>
                     <form onSubmit={handleLogin}>
                         <input
@@ -75,7 +85,12 @@ const HomePage = () => {
                             value={loginEmail}
                             onChange={(e) => setLoginEmail(e.target.value)}
                             required
-                            style={{ display: 'block', margin: '10px auto', padding: '10px', width: '80%' }}
+                            style={{
+                                display: 'block',
+                                margin: '10px auto',
+                                padding: '10px',
+                                width: '80%',
+                            }}
                         />
                         <input
                             type="password"
@@ -83,7 +98,12 @@ const HomePage = () => {
                             value={loginPassword}
                             onChange={(e) => setLoginPassword(e.target.value)}
                             required
-                            style={{ display: 'block', margin: '10px auto', padding: '10px', width: '80%' }}
+                            style={{
+                                display: 'block',
+                                margin: '10px auto',
+                                padding: '10px',
+                                width: '80%',
+                            }}
                         />
                         <button
                             type="submit"
@@ -94,7 +114,7 @@ const HomePage = () => {
                                 backgroundColor: hoverLogin ? '#0056b3' : '#007BFF',
                                 color: '#fff',
                                 border: 'none',
-                                borderRadius: '4px'
+                                borderRadius: '4px',
                             }}
                             onMouseEnter={() => setHoverLogin(true)}
                             onMouseLeave={() => setHoverLogin(false)}
@@ -105,14 +125,16 @@ const HomePage = () => {
                 </div>
 
                 {/* Signup Form */}
-                <div style={{
-                    width: '45%',
-                    backgroundColor: '#6996F0',
-                    padding: '20px',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 8px rgba(10, 10, 10, 10)',
-                    marginBottom: '20px'
-                }}>
+                <div
+                    style={{
+                        width: '45%',
+                        backgroundColor: '#6996F0',
+                        padding: '20px',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 8px rgba(10, 10, 10, 10)',
+                        marginBottom: '20px',
+                    }}
+                >
                     <h2>Sign Up</h2>
                     <form onSubmit={handleSignup}>
                         <input
@@ -121,7 +143,12 @@ const HomePage = () => {
                             value={signupEmail}
                             onChange={(e) => setSignupEmail(e.target.value)}
                             required
-                            style={{ display: 'block', margin: '10px auto', padding: '10px', width: '80%' }}
+                            style={{
+                                display: 'block',
+                                margin: '10px auto',
+                                padding: '10px',
+                                width: '80%',
+                            }}
                         />
                         <input
                             type="password"
@@ -129,7 +156,12 @@ const HomePage = () => {
                             value={signupPassword}
                             onChange={(e) => setSignupPassword(e.target.value)}
                             required
-                            style={{ display: 'block', margin: '10px auto', padding: '10px', width: '80%' }}
+                            style={{
+                                display: 'block',
+                                margin: '10px auto',
+                                padding: '10px',
+                                width: '80%',
+                            }}
                         />
                         <button
                             type="submit"
@@ -140,7 +172,7 @@ const HomePage = () => {
                                 backgroundColor: hoverSignup ? '#0056b3' : '#007BFF',
                                 color: '#fff',
                                 border: 'none',
-                                borderRadius: '4px'
+                                borderRadius: '4px',
                             }}
                             onMouseEnter={() => setHoverSignup(true)}
                             onMouseLeave={() => setHoverSignup(false)}
@@ -151,7 +183,18 @@ const HomePage = () => {
                 </div>
             </div>
 
-            {message && <p style={{ marginTop: '20px', color: 'blue' }}>{message}</p>}
+            {message && (
+                <p
+                    style={{
+                        marginTop: '40px',
+                        color: messageType === 'error' ? 'red' : 'green',
+                        fontWeight: 'bold',
+                        fontSize: '24px'
+                    }}
+                >
+                    {message}
+                </p>
+            )}
         </div>
     );
 };
