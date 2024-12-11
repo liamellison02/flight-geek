@@ -29,6 +29,18 @@ class Flight(db.Model):
     destination = db.Column(db.String(10), nullable=True)
     departure_time = db.Column(db.DateTime, nullable=False)
 
+    @property
+    def lowest_price(self):
+        if not self.price_history:
+            return None
+        return min([price.price for price in self.price_history])
+
+    @property
+    def current_price(self):
+        if not self.price_history:
+            return None
+        return self.price_history[-1].price
+
 
 class Tracker(db.Model):
     __tablename__ = 'trackers'
@@ -38,8 +50,9 @@ class Tracker(db.Model):
     flight_id = db.Column(db.Integer, db.ForeignKey('flights.id'), nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
-    user = db.relationship('User', backref=db.backref('trackers', lazy=True))
-    flight = db.relationship('Flight', backref=db.backref('trackers', lazy=True))
+    user = db.relationship('User', backref=db.backref('trackers', cascade="all, delete-orphan", lazy=True))
+    flight = db.relationship('Flight', backref=db.backref('trackers', cascade="all, delete-orphan", lazy=True))
+
 
 
 class Airline(db.Model):
@@ -70,4 +83,4 @@ class Price(db.Model):
     price = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
 
-    flight = db.relationship('Flight', backref=db.backref('price_history', lazy=True))
+    flight = db.relationship('Flight', backref=db.backref('price_history', cascade="all, delete-orphan", lazy=True))

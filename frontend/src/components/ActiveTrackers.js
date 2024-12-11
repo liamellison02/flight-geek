@@ -1,39 +1,30 @@
-import React, { useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
+import { UserContext } from '../contexts/UserContext';
+import { useNavigate, Link } from 'react-router-dom';
+import { Home, Search, PlaneTakeoff } from 'lucide-react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
-import { Home, Search, PlaneTakeoff, AlertCircle, Plane } from 'lucide-react';
 
 const ActiveTrackers = () => {
-    const [userId, setUserId] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [message, setMessage] = useState('');
+    const { user } = useContext(UserContext); 
     const [trackedFlights, setTrackedFlights] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    // Demo data structure for tracked flights
-    const demoTrackedFlights = [
-        {
-            id: 1,
-            flight_number: 'DL66',
-            origin: 'ATL',
-            destination: 'FCO',
-            departure_time: '2024-12-08T19:24:00',
-            current_price: 850,
-            price_history: [
-                { price: 900, timestamp: '2024-12-07T19:24:00' },
-                { price: 850, timestamp: '2024-12-08T19:24:00' }
-            ]
+    useEffect(() => {
+        if (user && user.id) {
+            fetchTrackedFlights(user.id);
         }
-    ];
+    }, [user]);
 
-    const handleRetrieveFlights = async (e) => {
-        e.preventDefault();
+    const fetchTrackedFlights = async (userId) => {
         setIsLoading(true);
+        setError('');
         try {
-            // For MVP demo, just set demo data
-            setTrackedFlights(demoTrackedFlights);
-            setMessage('Flights retrieved successfully');
+            const response = await axios.get(`http://localhost:5000/trackers?user_id=${userId}`);
+            setTrackedFlights(response.data);
         } catch (error) {
-            setMessage('Failed to retrieve tracked flights');
+            setError('Failed to retrieve tracked flights.');
+            console.error('Error fetching tracked flights:', error);
         } finally {
             setIsLoading(false);
         }
@@ -70,7 +61,7 @@ const ActiveTrackers = () => {
                             </Link>
                             <Link
                                 to="/active-trackers"
-                                className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-white bg-[#40E0FF]/30 hover:bg-[#40E0FF]/40 transition-colors"
+                                className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-white bg-[#40E0FF]/10 hover:bg-[#40E0FF]/20 transition-colors"
                             >
                                 <PlaneTakeoff className="h-4 w-4 mr-2" />
                                 Active Trackers
@@ -82,107 +73,58 @@ const ActiveTrackers = () => {
 
             {/* Main Content */}
             <div className="px-4 py-8">
-                {/* Header Section */}
-                <div className="max-w-xl mx-auto text-center mb-12">
-                    <img 
-                        src="/logo.jpeg" 
-                        alt="Flight Geek Logo" 
-                        className="w-20 h-20 mx-auto mb-6"
-                    />
-                    <h1 className="text-3xl font-bold text-white mb-2">
-                        Active Flight Trackers
-                    </h1>
-                    <p className="text-[#40E0FF] text-lg">
-                        Enter your information to see your active trackers
-                    </p>
-                </div>
+                <h1 className="text-3xl font-bold text-white text-center mb-6">Active Flight Trackers</h1>
 
-                {/* Form Section */}
-                <div className="max-w-2xl mx-auto">
-                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 shadow-lg border border-white/10">
-                        <form onSubmit={handleRetrieveFlights} className="space-y-6">
-                            <div>
-                                <label htmlFor="userId" className="block text-sm font-medium text-[#40E0FF] mb-1">
-                                    User ID
-                                </label>
-                                <input
-                                    id="userId"
-                                    type="text"
-                                    value={userId}
-                                    onChange={(e) => setUserId(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-lg bg-black/20 border border-[#40E0FF]/20 text-white placeholder-gray-400 focus:outline-none focus:border-[#40E0FF]/50 transition"
-                                    placeholder="Enter your user ID"
-                                    required
-                                />
-                            </div>
+                {isLoading && <p className="text-center text-white">Loading tracked flights...</p>}
+                {error && <p className="text-center text-red-500">{error}</p>}
 
-                            <button
-                                type="submit"
-                                disabled={isLoading}
-                                className="w-full px-6 py-3 rounded-lg bg-[#40E0FF] text-[#001524] font-semibold hover:bg-[#40E0FF]/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                            >
-                                <PlaneTakeoff className="h-5 w-5" />
-                                {isLoading ? 'Retrieving...' : 'Retrieve Flights'}
-                            </button>
-                        </form>
+                {!isLoading && trackedFlights.length === 0 && !error && (
+                    <p className="text-center text-gray-400">No active trackers found.</p>
+                )}
 
-                        {/* Quick Tips */}
-                        <div className="mt-8 p-4 rounded-lg bg-[#40E0FF]/5 border border-[#40E0FF]/10">
-                            <h3 className="text-[#40E0FF] font-medium mb-2 flex items-center gap-2">
-                                <AlertCircle className="h-5 w-5" />
-                                Quick Tips
-                            </h3>
-                            <ul className="text-gray-300 text-sm space-y-1">
-                                <li>• User ID is the same as your login email</li>
-                                <li>• Prices will be tracked every hour, you will see updates on this screen</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Tracked Flights Display */}
-                {trackedFlights.length > 0 && (
-                    <div className="max-w-4xl mx-auto mt-8">
-                        <div className="bg-white/5 backdrop-blur-sm rounded-xl shadow-lg border border-white/10">
-                            <div className="p-6">
-                                <h2 className="text-xl font-semibold text-white mb-6">Tracked Flights</h2>
-                                <div className="space-y-4">
-                                    {trackedFlights.map((flight) => (
-                                        <div 
-                                            key={flight.id}
-                                            className="flex items-center justify-between p-4 rounded-lg bg-black/20 border border-[#40E0FF]/10 hover:border-[#40E0FF]/30 transition"
-                                        >
-                                            <div className="flex items-center gap-4">
-                                                <div className="p-2 rounded-full bg-[#40E0FF]/10">
-                                                    <Plane className="h-6 w-6 text-[#40E0FF]" />
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-white font-medium">
-                                                        Flight {flight.flight_number}
-                                                    </h3>
-                                                    <p className="text-gray-400">
-                                                        {flight.origin} → {flight.destination}
-                                                    </p>
-                                                    <p className="text-sm text-gray-500">
-                                                        Departure: {new Date(flight.departure_time).toLocaleString()}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="text-[#40E0FF] font-medium">
-                                                    Current Price: ${flight.current_price}
-                                                </p>
-                                                <p className="text-sm text-gray-400">
-                                                    Last updated: {new Date(flight.price_history[0].timestamp).toLocaleString()}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    ))}
+                <div className="max-w-4xl mx-auto">
+                    {trackedFlights.map((flight) => (
+                        <div 
+                            key={flight.flight_id}
+                            className="flex items-center justify-between p-6 mb-4 rounded-lg bg-black/20 border border-[#40E0FF]/10 hover:border-[#40E0FF]/30 transition"
+                        >
+                            {/* Flight Details */}
+                            <div className="flex items-center gap-4">
+                                <div className="p-2 rounded-full bg-[#40E0FF]/10">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="#40E0FF" className="h-6 w-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 9.75a3 3 0 0 1 6 0M3 9.75h5.75a.25.25 0 0 0 .25-.25V3m-6 6.75A3.001 3.001 0 0 0 6 12m0 0h12m0 0a3.001 3.001 0 0 0 3-3.25M6 12v5.5a3.001 3.001 0 0 0 2.25 2.916m5.75-8.416V6m-2.5 6.75H6m2.5-2.5H21m0 0a3.001 3.001 0 0 1-3.25-2.5m3.25 2.5H6m2.5-3V9m0 0V6m0 0h6m-6 3.25a3.001 3.001 0 0 1 3 2.5M21 9.75h-6.75m6.75 0V6" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 className="text-lg text-white font-medium">
+                                        Flight {flight.flight_number}
+                                    </h3>
+                                    <p className="text-gray-400">
+                                        {flight.origin} → {flight.destination}
+                                    </p>
+                                    <p className="text-sm text-gray-500">
+                                        Departure: {new Date(flight.departure_time).toLocaleString()}
+                                    </p>
                                 </div>
                             </div>
+
+                            {/* Price Details */}
+                            <div className="text-right">
+                                <p className="text-[#40E0FF] font-medium">
+                                    Current Price: ${flight.current_price || 'N/A'}
+                                </p>
+                                <p className="text-sm text-gray-400">
+                                    Lowest Price: ${flight.lowest_price || 'N/A'}
+                                </p>
+                                <p className="text-sm text-gray-400">
+                                    Last Updated: {flight.price_history.length > 0
+                                        ? new Date(flight.price_history[0].timestamp).toLocaleString()
+                                        : 'N/A'}
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    ))}
+                </div>
             </div>
         </div>
     );

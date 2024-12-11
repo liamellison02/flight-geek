@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { Home, Search, PlaneTakeoff } from 'lucide-react';
+import { UserContext } from '../contexts/UserContext';
 
 const HomePage = () => {
+    const { setUser } = useContext(UserContext); 
     const [loginEmail, setLoginEmail] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
     const [signupEmail, setSignupEmail] = useState('');
@@ -15,11 +17,17 @@ const HomePage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:5000/login', { email: loginEmail, password: loginPassword });
-            
+            const response = await axios.post('http://localhost:5000/login', {
+                email: loginEmail,
+                password: loginPassword,
+            });
+
             if (response.status === 200 || response.data.message === 'Login successful') {
                 setMessage('Login successful');
                 setMessageType('success');
+
+                setUser({ id: response.data.userId, email: loginEmail });
+
                 setTimeout(() => {
                     navigate('/search-flights');
                 }, 500);
@@ -39,6 +47,9 @@ const HomePage = () => {
             });
             setMessage(response.data.message || 'Signup successful');
             setMessageType('success');
+
+            setUser({ id: response.data.userId, email: loginEmail });
+
             setTimeout(() => {
                 navigate('/search-flights');
             }, 500);

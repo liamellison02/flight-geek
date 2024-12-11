@@ -74,7 +74,7 @@ def signup():
     db.session.add(user)
     db.session.commit()
 
-    return jsonify({"message": "Signup successful"}), 201
+    return jsonify({"message": "Signup successful", "userId": user.id, "email": user.email}), 201
 
 
 @app.route('/login', methods=['POST'])
@@ -85,7 +85,7 @@ def login():
 
     user = User.query.filter_by(email=email).first()
     if user and user.check_password(password):
-        return jsonify({"message": "Login successful"}), 200
+        return jsonify({"message": "Login successful", "userId": user.id, "email": user.email}), 200
     return jsonify({"error": "Invalid email or password"}), 401
 
 
@@ -140,15 +140,41 @@ def tracker_tab():
             return jsonify({"error": "User ID is required"}), 400
 
         trackers = Tracker.query.filter_by(user_id=user_id).all()
+        if not trackers:
+            return jsonify({"message": "No trackers found for this user"}), 200
+
         flight_ids = [tracker.flight_id for tracker in trackers]
+
+        flights = Flight.query.filter(Flight.id.in_(flight_ids)).all()
+        flights_dict = {flight.id: flight for flight in flights}
 
         price_history = Price.query.filter(Price.flight_id.in_(flight_ids)).order_by(Price.timestamp.desc()).all()
 
-        result = [{
-            "flight_id": history.flight_id,
-            "price": history.price,
-            "timestamp": history.timestamp
-        } for history in price_history]
+        result = []
+        for tracker in trackers:
+            flight_id = tracker.flight_id
+            flight = flights_dict.get(flight_id)
+            if not flight:
+                continue
+
+            flight_prices = [price for price in price_history if price.flight_id == flight_id]
+            if flight_prices:
+                current_price = flight_prices[0].price
+                lowest_price = min([price.price for price in flight_prices])
+            else:
+                current_price = None
+                lowest_price = None
+
+            result.append({
+                "flight_id": flight_id,
+                "flight_number": flight.flight_number,
+                "origin": flight.origin,
+                "destination": flight.destination,
+                "departure_time": flight.departure_time,
+                "current_price": current_price,
+                "lowest_price": lowest_price,
+                "price_history": [{"price": price.price, "timestamp": price.timestamp} for price in flight_prices]
+            })
 
         return jsonify(result), 200
 
@@ -325,7 +351,7 @@ def refresh_data():
             for price in data["prices"]:
                 flight = Flight.query.filter_by(flight_number=price.get('flight_number')).first()
                 if flight:
-                    price_entry = Price(flight_id=flight.id, price=price.get('price'))
+                    price_entry = Price(flight_id=flight.id, price=price.get('price'), timestamp=dt.fromtimestamp(price.get('timestamp')))
                     db.session.add(price_entry)
                     db.session.commit()
             return jsonify({"message": "Data added successfully"}), 201

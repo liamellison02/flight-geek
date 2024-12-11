@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Search, Plane, Home, PlaneTakeoff } from 'lucide-react';
+import { UserContext } from '../contexts/UserContext';
 
 const FlightSearch = () => {
+    const { user } = useContext(UserContext); // Access the UserContext
     const [flightNumber, setFlightNumber] = useState('');
     const [flights, setFlights] = useState([]);
-    const [userId, setUserId] = useState(9);
-    const [flightId, setFlightId] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
@@ -16,7 +16,7 @@ const FlightSearch = () => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
-        
+
         try {
             const response = await axios.get(`http://localhost:5000/flights?flight_number=${flightNumber}`);
             setFlights(response.data);
@@ -32,14 +32,19 @@ const FlightSearch = () => {
     };
 
     const handleCreateTracker = async (flightId) => {
+        if (!user || !user.id) {
+            setError('You must be logged in to create a tracker.');
+            return;
+        }
+
         setIsLoading(true);
         setMessage('');
         setError('');
-    
+
         try {
             const response = await axios.post('http://localhost:5000/trackers', { 
-                user_id: userId, 
-                flight_id: flightId // Use the passed flightId
+                user_id: user.id, // Use logged-in user's ID
+                flight_id: flightId
             });
             setMessage(response.data.message || 'Tracker created successfully');
         } catch (error) {
@@ -172,7 +177,7 @@ const FlightSearch = () => {
                                                 </div>
                                             </div>
                                             <button 
-                                                onClick={() => handleCreateTracker(flight.id)} // Will implement in next iteration
+                                                onClick={() => handleCreateTracker(flight.id)}
                                                 className="px-4 py-2 rounded-lg bg-[#40E0FF]/10 text-[#40E0FF] hover:bg-[#40E0FF]/20 transition-colors"
                                             >
                                                 Track Price
