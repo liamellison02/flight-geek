@@ -1,49 +1,39 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Search, Plane, Home, PlaneTakeoff } from 'lucide-react';
+import { Home, Search, PlaneTakeoff, AlertCircle, Plane } from 'lucide-react';
 
-const FlightSearch = () => {
-    const [flightNumber, setFlightNumber] = useState('');
-    const [flights, setFlights] = useState([]);
-    const [userId, setUserId] = useState(9);
-    const [flightId, setFlightId] = useState('');
+const ActiveTrackers = () => {
+    const [userId, setUserId] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState('');
-    const [error, setError] = useState('');
+    const [trackedFlights, setTrackedFlights] = useState([]);
 
-    const handleSearch = async (e) => {
+    // Demo data structure for tracked flights
+    const demoTrackedFlights = [
+        {
+            id: 1,
+            flight_number: 'DL66',
+            origin: 'ATL',
+            destination: 'FCO',
+            departure_time: '2024-12-08T19:24:00',
+            current_price: 850,
+            price_history: [
+                { price: 900, timestamp: '2024-12-07T19:24:00' },
+                { price: 850, timestamp: '2024-12-08T19:24:00' }
+            ]
+        }
+    ];
+
+    const handleRetrieveFlights = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        setError('');
-        
         try {
-            const response = await axios.get(`http://localhost:5000/flights?flight_number=${flightNumber}`);
-            setFlights(response.data);
-            if (response.data.length === 0) {
-                setError('No flights found with this number.');
-            }
+            // For MVP demo, just set demo data
+            setTrackedFlights(demoTrackedFlights);
+            setMessage('Flights retrieved successfully');
         } catch (error) {
-            console.error('Error fetching flights:', error);
-            setError('Failed to fetch flight information. Please try again.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleCreateTracker = async (flightId) => {
-        setIsLoading(true);
-        setMessage('');
-        setError('');
-    
-        try {
-            const response = await axios.post('http://localhost:5000/trackers', { 
-                user_id: userId, 
-                flight_id: flightId // Use the passed flightId
-            });
-            setMessage(response.data.message || 'Tracker created successfully');
-        } catch (error) {
-            setError(error.response?.data?.error || 'Failed to create tracker');
+            setMessage('Failed to retrieve tracked flights');
         } finally {
             setIsLoading(false);
         }
@@ -73,14 +63,14 @@ const FlightSearch = () => {
                             </Link>
                             <Link
                                 to="/search-flights"
-                                className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-white bg-[#40E0FF]/30 hover:bg-[#40E0FF]/40 transition-colors"
+                                className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-white bg-[#40E0FF]/10 hover:bg-[#40E0FF]/20 transition-colors"
                             >
                                 <Search className="h-4 w-4 mr-2" />
                                 Search Flights
                             </Link>
                             <Link
                                 to="/active-trackers"
-                                className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-white bg-[#40E0FF]/10 hover:bg-[#40E0FF]/20 transition-colors"
+                                className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-white bg-[#40E0FF]/30 hover:bg-[#40E0FF]/40 transition-colors"
                             >
                                 <PlaneTakeoff className="h-4 w-4 mr-2" />
                                 Active Trackers
@@ -100,57 +90,64 @@ const FlightSearch = () => {
                         className="w-20 h-20 mx-auto mb-6"
                     />
                     <h1 className="text-3xl font-bold text-white mb-2">
-                        Search Flights
+                        Active Flight Trackers
                     </h1>
                     <p className="text-[#40E0FF] text-lg">
-                        Enter a flight number to track prices
+                        Enter your information to see your active trackers
                     </p>
                 </div>
 
-                {/* Search Form */}
-                <div className="max-w-2xl mx-auto mb-12">
+                {/* Form Section */}
+                <div className="max-w-2xl mx-auto">
                     <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 shadow-lg border border-white/10">
-                        <form onSubmit={handleSearch} className="relative">
-                            <div className="flex gap-4">
-                                <div className="relative flex-1">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <Search className="h-5 w-5 text-[#40E0FF]/50" />
-                                    </div>
-                                    <input
-                                        type="text"
-                                        value={flightNumber}
-                                        onChange={(e) => setFlightNumber(e.target.value)}
-                                        placeholder="Enter flight number (e.g., AA123)"
-                                        className="w-full pl-10 pr-4 py-3 rounded-lg bg-black/20 border border-[#40E0FF]/20 text-white placeholder-gray-400 focus:outline-none focus:border-[#40E0FF]/50 transition"
-                                    />
-                                </div>
-                                <button
-                                    type="submit"
-                                    disabled={isLoading || !flightNumber}
-                                    className="px-6 py-3 rounded-lg bg-[#40E0FF] text-[#001524] font-semibold hover:bg-[#40E0FF]/90 transition-colors disabled:opacity-50"
-                                >
-                                    {isLoading ? 'Searching...' : 'Search'}
-                                </button>
+                        <form onSubmit={handleRetrieveFlights} className="space-y-6">
+                            <div>
+                                <label htmlFor="userId" className="block text-sm font-medium text-[#40E0FF] mb-1">
+                                    User ID
+                                </label>
+                                <input
+                                    id="userId"
+                                    type="text"
+                                    value={userId}
+                                    onChange={(e) => setUserId(e.target.value)}
+                                    className="w-full px-4 py-3 rounded-lg bg-black/20 border border-[#40E0FF]/20 text-white placeholder-gray-400 focus:outline-none focus:border-[#40E0FF]/50 transition"
+                                    placeholder="Enter your user ID"
+                                    required
+                                />
                             </div>
+
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className="w-full px-6 py-3 rounded-lg bg-[#40E0FF] text-[#001524] font-semibold hover:bg-[#40E0FF]/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                            >
+                                <PlaneTakeoff className="h-5 w-5" />
+                                {isLoading ? 'Retrieving...' : 'Retrieve Flights'}
+                            </button>
                         </form>
+
+                        {/* Quick Tips */}
+                        <div className="mt-8 p-4 rounded-lg bg-[#40E0FF]/5 border border-[#40E0FF]/10">
+                            <h3 className="text-[#40E0FF] font-medium mb-2 flex items-center gap-2">
+                                <AlertCircle className="h-5 w-5" />
+                                Quick Tips
+                            </h3>
+                            <ul className="text-gray-300 text-sm space-y-1">
+                                <li>• User ID is the same as your login email</li>
+                                <li>• Prices will be tracked every hour, you will see updates on this screen</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
-                {/* Error Message */}
-                {error && (
-                    <div className="max-w-2xl mx-auto mb-8 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                        <p className="text-red-200 text-center">{error}</p>
-                    </div>
-                )}
-
-                {/* Results Section */}
-                {flights.length > 0 && (
-                    <div className="max-w-4xl mx-auto">
+                {/* Tracked Flights Display */}
+                {trackedFlights.length > 0 && (
+                    <div className="max-w-4xl mx-auto mt-8">
                         <div className="bg-white/5 backdrop-blur-sm rounded-xl shadow-lg border border-white/10">
                             <div className="p-6">
-                                <h2 className="text-xl font-semibold text-white mb-6">Search Results</h2>
+                                <h2 className="text-xl font-semibold text-white mb-6">Tracked Flights</h2>
                                 <div className="space-y-4">
-                                    {flights.map((flight) => (
+                                    {trackedFlights.map((flight) => (
                                         <div 
                                             key={flight.id}
                                             className="flex items-center justify-between p-4 rounded-lg bg-black/20 border border-[#40E0FF]/10 hover:border-[#40E0FF]/30 transition"
@@ -171,12 +168,14 @@ const FlightSearch = () => {
                                                     </p>
                                                 </div>
                                             </div>
-                                            <button 
-                                                onClick={() => handleCreateTracker(flight.id)} // Will implement in next iteration
-                                                className="px-4 py-2 rounded-lg bg-[#40E0FF]/10 text-[#40E0FF] hover:bg-[#40E0FF]/20 transition-colors"
-                                            >
-                                                Track Price
-                                            </button>
+                                            <div className="text-right">
+                                                <p className="text-[#40E0FF] font-medium">
+                                                    Current Price: ${flight.current_price}
+                                                </p>
+                                                <p className="text-sm text-gray-400">
+                                                    Last updated: {new Date(flight.price_history[0].timestamp).toLocaleString()}
+                                                </p>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -189,4 +188,4 @@ const FlightSearch = () => {
     );
 };
 
-export default FlightSearch;
+export default ActiveTrackers;

@@ -78,11 +78,11 @@ const HomePage = () => {
                                 Search Flights
                             </Link>
                             <Link
-                                to="/create-tracker"
+                                to="/active-trackers"
                                 className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-white bg-[#40E0FF]/10 hover:bg-[#40E0FF]/20 transition-colors"
                             >
                                 <PlaneTakeoff className="h-4 w-4 mr-2" />
-                                Create Tracker
+                                Active Trackers
                             </Link>
                         </div>
                     </div>

@@ -174,7 +174,7 @@ def add_local_data():
     
         if request.args.get('price') == 'true':
             data = request.get_json()
-            for price in data:
+            for price in data['prices']:
                 price = Price(
                     flight_id=price.get('flight_id'),
                     price=price.get('price'),
